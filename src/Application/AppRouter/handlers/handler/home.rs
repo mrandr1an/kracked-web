@@ -31,7 +31,6 @@ async fn home_html() -> Result<Html<String>, StatusCode>
 		let js_link = "<script src=\"script/main.js\"></script>";
 		let html_with_css_and_js = html_with_css
 		    .replace(js_link, js_contents.as_str());
-		println!("{} with {}", html_with_css_and_js, css_link);
 		Ok(Html(html_with_css_and_js))
 	    }
 	    //Cant find js file

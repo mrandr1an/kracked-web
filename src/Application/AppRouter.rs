@@ -4,6 +4,7 @@ use axum::{error_handling::HandleErrorLayer, BoxError};
 //Tower
 use tower_http::services::ServeDir;
 use tower::ServiceBuilder;
+use tower_http::{trace::TraceLayer};
 use tower_governor::{errors::display_error, governor::GovernorConfigBuilder, GovernorLayer};
 //Custom
 mod handlers;
@@ -29,11 +30,13 @@ impl AppRouter
 		.nest("/home",
 		      handlers::handler::home::home())
 		.layer(ServiceBuilder::new()
-               // this middleware goes above `GovernorLayer` because it will receive
-               // errors returned by `GovernorLayer`
-               .layer(HandleErrorLayer::new(|e: BoxError| async move {
-                   display_error(e)
-               }))
+		// High level logging of requests and responses
+		.layer(TraceLayer::new_for_http())
+		// this middleware goes above `GovernorLayer` because it will receive
+		// errors returned by `GovernorLayer`
+		.layer(HandleErrorLayer::new(|e: BoxError| async move {
+		    display_error(e)
+		}))
                .layer(GovernorLayer {
                    // We can leak this because it is created once and then
                    config: Box::leak(governor_conf),
