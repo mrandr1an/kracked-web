@@ -42,6 +42,7 @@ impl AppRouter
                    config: Box::leak(governor_conf),
                }),
 		)
+		.fallback(handlers::handler::fallback::fallback)
 	}
     }
 }
