@@ -8,11 +8,11 @@ use axum::{
 //Tracing
 use tracing::{debug, error, info};
 //Custom
-use super::home_error::HomeError;
+use super::page_error::PageError;
 
 pub enum AppError
 {
-    HomeError(HomeError),
+    PageError(PageError),
     NotFound,
 }
 
@@ -65,7 +65,7 @@ impl IntoResponse for AppError
 impl std::fmt::Display for AppError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AppError::HomeError(v) => write!(f, "AppError : HomeError : {}", v ),
+            AppError::PageError(v) => write!(f, "AppError : HomeError : {}", v ),
             AppError::NotFound => write!(f, "AppError : NotFound"),
 	    _ => write!(f, "Unknown error")
         }
