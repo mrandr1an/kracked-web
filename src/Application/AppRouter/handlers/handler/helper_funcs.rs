@@ -1,7 +1,7 @@
 //Std
 use std::fs;
 use axum::response::Html;
-
+use std::{pin::Pin, future::Future};
 //tracing
 use tracing::{debug, error, info};
 //Custom Error
@@ -22,10 +22,11 @@ pub async fn retreive_page_untouched
 	{
 
 	    info!("Processing: Adding css of {}",name);
-	    let css_link = "<link rel=\"stylesheet\" href=\"style/home.css\">";
+	    let css_link = format!("<link rel=\"stylesheet\" href=\"style/{name}.css\">");
+	  
             css_contents = "<style>".to_owned() + css_contents.as_str() + "</style>";
 	    let html_with_css = html_contents
-		.replace(css_link, css_contents.as_str());
+		.replace(&css_link, css_contents.as_str());
 	    if let Ok(js_contents) = fs::read_to_string(path_js)
 	    {
 
@@ -53,5 +54,16 @@ pub async fn retreive_page_untouched
     {
 	error!("Could not add HTML of {}", name);
 	Err(AppError::PageError(PageError::CouldntLoadHTML))
+    }
+}
+
+pub async fn retrieve_page_with_state<F>(name: &str, f: F) -> Result<Html<String>, AppError>
+where
+    F: FnOnce(Html<String>) -> Pin<Box<dyn Future<Output=Result<Html<String>, AppError>>>> + Send,
+{
+    match retreive_page_untouched(name).await
+    {
+	Ok(page) => return f(page).await,
+	Err(err) => Err(err),
     }
 }
