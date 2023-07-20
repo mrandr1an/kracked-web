@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  krackedweb:
+    image: kracked/krackedweb
+    ports:
+      - "443:443"
+      - "3000:3000"
+    restart: always
+    networks:
+      - web
+
+  certbot:
+    image: certbot/certbot
+    command: certonly --webroot --webroot-path=/usr/src/kracked-web/frontend -d kracked.site -d kracked.site 
+    volumes:
+      - ./frontend:/usr/src/kracked-web/frontend
+      - /etc/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - krackedweb
+    entrypoint: sh -c "trap 'exit 0' INT; while :; do certbot renew; sleep 12h; done"
+
+networks:
+  web:
+    driver: bridge
