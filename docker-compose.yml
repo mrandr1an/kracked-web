@@ -12,7 +12,7 @@ services:
 
   certbot:
     image: certbot/certbot
-    command: certonly --webroot --webroot-path=/usr/src/kracked-web/frontend -d kracked.site -d kracked.site 
+    command: certonly --webroot --webroot-path=/usr/src/kracked-web/frontend -d kracked.site -d www.kracked.site 
     volumes:
       - ./frontend:/usr/src/kracked-web/frontend
       - /etc/letsencrypt:/etc/letsencrypt
