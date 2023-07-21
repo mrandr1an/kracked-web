@@ -130,7 +130,7 @@ pub async fn retrieve_blog(category: &str, title: &str) -> Result<Html<String>, 
 	if let Ok(blog_html) = retreive_template_untouched("blog").await
 	{
 	    let blog_str = blog_html.0;
-	    let blog_with_content = blog_str.replace("{content}", blog_contents.as_str());
+	    let blog_with_content = blog_str.replace("{rant}", blog_contents.as_str());
 	    let blog_complete = blog_with_content.replace("{title}", title);
 	    Ok(Html(blog_complete))
 	}
