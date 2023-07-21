@@ -10,7 +10,7 @@ background: linear-gradient(to right, #F7B733, #FC4A1A);
 
 #blog-div
 {
-    background: linear-gradient(to left, black, gray);
+    background: linear-gradient(to left, white, gray);
     border: 5px solid green;
     border-radius:10px;
     padding: 10px;
