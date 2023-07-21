@@ -17,6 +17,7 @@ WORKDIR /usr/src/kracked-web
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY domain.crt /etc/nginx/domain.crt
 COPY domain.key /etc/nginx/domain.key
+COPY /var/www/blogs /var/www/blogs
 
 COPY --from=builder /usr/local/cargo/bin/kracked-web /usr/src/kracked-web
 COPY ./frontend /usr/src/kracked-web/frontend
