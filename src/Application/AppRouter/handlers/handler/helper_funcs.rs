@@ -58,6 +58,58 @@ pub async fn retreive_page_untouched
     }
 }
 
+
+
+pub async fn retreive_template_untouched
+    (name: &str) -> Result<Html<String>, AppError>
+{
+    info!("Retreiving page {}", name);
+    let path_html = format!("frontend/templates/{name}/{name}.html");
+
+    let path_css = format!("frontend/templates/{name}/style/{name}.css");
+    let path_js = format!("frontend/templates/{name}/script/main.js");
+    if let Ok(html_contents) = fs::read_to_string(path_html)
+    {
+	if let Ok(mut css_contents) = fs::read_to_string(path_css)
+	{
+
+	    info!("Processing: Adding css of {}",name);
+	    let css_link = format!("<link rel=\"stylesheet\" href=\"style/{name}.css\">");
+	  
+            css_contents = "<style>".to_owned() + css_contents.as_str() + "</style>";
+	    let html_with_css = html_contents
+		.replace(&css_link, css_contents.as_str());
+	    if let Ok(mut js_contents) = fs::read_to_string(path_js)
+	    {
+
+                info!("Processing: Adding js of {}",name);
+		let js_link = "<script src=\"script/main.js\"></script>";
+		js_contents = "<script>".to_owned() + js_contents.as_str() + "</script>";
+		let html_with_css_and_js = html_with_css
+		    .replace(js_link, js_contents.as_str());
+		Ok(Html(html_with_css_and_js))
+	    }
+	    //Cant find js file
+	    else {
+		error!("Could not add js of {}", name);
+	       Err(AppError::PageError(PageError::CouldntLoadJS))
+	    }
+	}
+	//Cant find css file
+	else
+	{
+		error!("Could not add css of {}", name);
+	       Err(AppError::PageError(PageError::CouldntLoadCSS))
+	}
+    }
+    //Cant find html file
+    else
+    {
+	error!("Could not add HTML of {}", name);
+	Err(AppError::PageError(PageError::CouldntLoadHTML))
+    }
+}
+
 pub async fn retrieve_page_with_state<F>(name: &str, f: F) -> Result<Html<String>, AppError>
 where
     F: FnOnce(Html<String>) -> Pin<Box<dyn Future<Output=Result<Html<String>, AppError>>>> + Send,
@@ -66,5 +118,29 @@ where
     {
 	Ok(page) => return f(page).await,
 	Err(err) => Err(err),
+    }
+}
+
+
+pub async fn retrieve_blog(category: &str, title: &str) -> Result<Html<String>, AppError>
+{
+    let blog_path = format!("/var/www/blogs/{category}/{title}");
+    if let Ok(blog_contents) = fs::read_to_string(blog_path)
+    {
+	if let Ok(blog_html) = retreive_template_untouched("blog").await
+	{
+	    let blog_str = blog_html.0;
+	    let blog_with_content = blog_str.replace("{content}", blog_contents.as_str());
+	    let blog_complete = blog_with_content.replace("{title}", title);
+	    Ok(Html(blog_complete))
+	}
+	else
+	{
+	    return Err(AppError::BadRequest);
+	}
+	}
+    else
+    {
+	return Err(AppError::BadRequest);
     }
 }

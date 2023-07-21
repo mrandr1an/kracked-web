@@ -31,6 +31,8 @@ impl AppRouter
 	    router:Router::new()
 		.nest("/home",
 		      handlers::handler::home::home())
+		.route("/blog/:category/:title",
+		get(handlers::handler::blog::blog))
 		.fallback(handlers::handler::fallback::fallback)
 		.layer(ServiceBuilder::new()
 		// High level logging of requests and responses

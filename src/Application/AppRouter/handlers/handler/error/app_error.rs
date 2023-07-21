@@ -3,8 +3,8 @@ use std::fs;
 //Axum
 use axum::{
     response::{IntoResponse, Html},
-    http::StatusCode
 };
+
 //Tracing
 use tracing::{debug, error, info};
 //Custom
@@ -13,6 +13,7 @@ use super::page_error::PageError;
 pub enum AppError
 {
     PageError(PageError),
+    BadRequest,
     NotFound,
 }
 
@@ -67,6 +68,7 @@ impl std::fmt::Display for AppError {
         match self {
             AppError::PageError(v) => write!(f, "AppError : HomeError : {}", v ),
             AppError::NotFound => write!(f, "AppError : NotFound"),
+	    AppError::BadRequest => write!(f,"AppError : BadRequest"),
 	    _ => write!(f, "Unknown error")
         }
     }
