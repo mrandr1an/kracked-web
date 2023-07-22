@@ -17,7 +17,7 @@
 
     function handleSearch() {
       const keyword = searchInput.value;
-	const backendUrl = 'https://localhost:443/blogsearch';
+	const backendUrl = 'https://kracked.site/blogsearch';
 
       fetch(backendUrl, {
         method: "POST",
@@ -28,7 +28,7 @@
       })
         .then(response => response.json())
         .then(data => {
-          console.log(data);
+          alert(data);
         })
         .catch(error => {
           console.error("Error:", error);
