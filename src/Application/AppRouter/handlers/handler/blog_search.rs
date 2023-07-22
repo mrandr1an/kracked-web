@@ -19,7 +19,12 @@ pub struct Keyword
  value: String
 }
 
- 
+#[derive(Deserialize, Serialize)]
+pub struct BlogCard
+{
+    title: String,
+    desc: String,
+}
 
 pub async fn get_blog_search() -> Result<Html<String>, AppError>
 {
@@ -73,7 +78,12 @@ fn get_from_category(search_dir: &str) -> Result<String, AppError>
         }
 	else
 	{
-	    return Ok(String::from("Some string"));
+	    let blog_card = BlogCard
+	    {
+		title: String::from("My blog"),
+		desc: String::from("yeah"),
+	    };
+	    return Ok(serde_json::to_string(&blog_card).unwrap())
 	}
     }
     Err(AppError::BadRequest)
