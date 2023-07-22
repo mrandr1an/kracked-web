@@ -33,11 +33,12 @@ impl IntoResponse for AppError
             css_contents = "<style>".to_owned() + css_contents.as_str() + "</style>";
 	    let html_with_css = html_contents
 		.replace(css_link, css_contents.as_str());
-	    if let Ok(js_contents) = fs::read_to_string("frontend/pages/error/script/main.js")
+	    if let Ok(mut js_contents) = fs::read_to_string("frontend/pages/error/script/main.js")
 	    {
 
 		info!("Adding js of errorpage");
 		let js_link = "<script src=\"script/main.js\"></script>";
+		js_contents = "<script>".to_owned() + js_contents.as_str() + "</script>";
 		let html_with_css_and_js = html_with_css
 		    .replace(js_link, js_contents.as_str());
 		return Html(html_with_css_and_js).into_response();
