@@ -32,7 +32,9 @@ impl AppRouter
 		.nest("/home",
 		      handlers::handler::home::home())
 		.route("/blog/:category/:title",
-		get(handlers::handler::blog::blog))
+		       get(handlers::handler::blog::blog))
+		.route("/blogsearch", get(handlers::handler::blog_search::get_blog_search)
+		       .post(handlers::handler::blog_search::post_blog_search))
 		.fallback(handlers::handler::fallback::fallback)
 		.layer(ServiceBuilder::new()
 		// High level logging of requests and responses
