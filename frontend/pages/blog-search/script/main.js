@@ -28,7 +28,7 @@
       })
         .then(response => response.json())
         .then(data => {
-          alert(data.title);
+  document.getElementById("results").appendChild(createComplexElement);
         })
         .catch(error => {
           console.error("Error:", error);
@@ -47,4 +47,43 @@
       };
     }
 
+  $(document).ready(function() {
+    function createComplexElement(title, description) {
+      const outerDiv = document.createElement("div");
+      outerDiv.className = "col-md-6 col-lg-4";
+      outerDiv.id = "kracked-web";
+
+      const innerDiv = document.createElement("div");
+      innerDiv.className = "card mb-3 rounded";
+
+      const cardBodyDiv = document.createElement("div");
+      cardBodyDiv.className = "card-body";
+
+      const titleElement = document.createElement("h5");
+      titleElement.className = "card-title";
+      titleElement.textContent = title;
+
+      const descriptionElement = document.createElement("p");
+      descriptionElement.className = "card-text";
+      descriptionElement.textContent = description;
+
+      const linkElement = document.createElement("a");
+      linkElement.href = "#";
+      linkElement.className = "btn btn-primary";
+      linkElement.textContent = "Click this card for more";
+
+      cardBodyDiv.appendChild(titleElement);
+      cardBodyDiv.appendChild(descriptionElement);
+      cardBodyDiv.appendChild(linkElement);
+
+      innerDiv.appendChild(cardBodyDiv);
+
+      outerDiv.appendChild(innerDiv);
+
+      return outerDiv;
+    }
+
+
   });
+
+
