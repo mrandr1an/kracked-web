@@ -28,7 +28,7 @@
       })
         .then(response => response.json())
         .then(data => {
-          alert(data);
+          alert(data.title);
         })
         .catch(error => {
           console.error("Error:", error);
