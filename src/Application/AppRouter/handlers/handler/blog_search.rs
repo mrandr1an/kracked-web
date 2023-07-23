@@ -31,17 +31,17 @@ pub async fn get_blog_search() -> Result<Html<String>, AppError>
     retreive_page_untouched("blog-search").await
 }
 
-pub async fn post_blog_search(Json(keyword): Json<Keyword>) -> String
+pub async fn post_blog_search(Json(keyword): Json<Keyword>) -> Json<BlogCard>
 {
     let error = r#"{"message": "No results"}"#;
     match read_directory(keyword).await
     {
-	Ok(v) => serde_json::to_string(&v).unwrap(),
-	Err(_e) => serde_json::from_str(error).unwrap(),
+	Ok(v) => Json(v),
+	Err(e) => Json(BlogCard{title: "None".to_string(), desc: "None".to_string()}) 
     }
 }
 
-pub async fn read_directory(keyword: Keyword) -> Result<String, AppError>
+pub async fn read_directory(keyword: Keyword) -> Result<BlogCard, AppError>
 {
     let search_dir = "/var/www/blogs/";
       // Recursively iterate over the directories and files inside the search directory
@@ -70,7 +70,7 @@ pub async fn read_directory(keyword: Keyword) -> Result<String, AppError>
     Err(AppError::BadRequest)
 }
 
-fn get_from_category(search_dir: &str) -> Result<String, AppError>
+fn get_from_category(search_dir: &str) -> Result<BlogCard, AppError>
 { 
       // Recursively iterate over the directories and files inside the search directory
     for entry in WalkDir::new(search_dir).into_iter().filter_map(|e| e.ok()) {
@@ -87,7 +87,7 @@ fn get_from_category(search_dir: &str) -> Result<String, AppError>
 		title: String::from("My blog"),
 		desc: String::from("yeah"),
 	    };
-	    return Ok(serde_json::to_string(&blog_card).unwrap())
+	    return Ok(blog_card)
 	}
     }
     Err(AppError::BadRequest)
