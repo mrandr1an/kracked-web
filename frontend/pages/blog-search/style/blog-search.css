@@ -24,3 +24,21 @@ background: linear-gradient(to right, #F7B733, #FC4A1A);
   z-index: -1;
   filter: blur(7px); 
 }
+
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+#blog-card {
+  animation-name: slideInFromLeft;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+  opacity: 1; /* Set opacity to 1 so the element is visible during the animation */
+}

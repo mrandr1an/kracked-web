@@ -50,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function createComplexElement(title, description) {
+      if(title != "No results"){
     const outerDiv = document.createElement("div");
     outerDiv.className = "col-md-6 col-lg-4";
     outerDiv.id = "blog-card";
@@ -82,6 +83,13 @@ document.addEventListener("DOMContentLoaded", function () {
     outerDiv.appendChild(innerDiv);
 
     return outerDiv;
+      }
+      else
+      {
+
+	  const outerDiv = document.createElement("div");
+	  return outerDiv;
+      }
   }
 
 });
