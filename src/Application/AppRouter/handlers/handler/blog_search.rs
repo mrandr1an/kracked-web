@@ -12,6 +12,9 @@ use super::error::app_error::AppError;
 use super::helper_funcs::retreive_page_untouched;
 //Walkdir
 use walkdir::WalkDir;
+//Std
+use std::fs::File;
+use std::io::{self, BufRead, BufReader};
 
 #[derive(Deserialize, Serialize)]
 pub struct Keyword
@@ -37,38 +40,30 @@ let keyword_value = keyword.value.clone();
 
     // Check /var/www/blogs/compsci if contains Keyword
     let compsci_dir = "/var/www/blogs/compsci";
-    if check_directory_for_keyword(compsci_dir, &keyword_value) {
-        return Json(BlogCard {
-            title: String::from("Computer Science Blog"),
-            desc: String::from("Found in Computer Science blog"),
-        });
+    let (is_cat,card) = check_directory_for_keyword(compsci_dir, &keyword.value);
+	if is_cat{
+        return Json(card);
     }
 
     // Else Check /var/www/blogs/misc if contains Keyword
     let misc_dir = "/var/www/blogs/misc";
-    if check_directory_for_keyword(misc_dir, &keyword_value) {
-        return Json(BlogCard {
-            title: String::from("Miscellaneous Blog"),
-            desc: String::from("Found in Miscellaneous blog"),
-        });
+    let ( is_cat,  card) = check_directory_for_keyword(misc_dir, &keyword.value);
+	if is_cat{
+        return Json(card);
     }
 
     // Else Check /var/www/blogs/cybersec if contains Keyword
     let cybersec_dir = "/var/www/blogs/cybersec";
-    if check_directory_for_keyword(cybersec_dir, &keyword_value) {
-        return Json(BlogCard {
-            title: String::from("Cybersecurity Blog"),
-            desc: String::from("Found in Cybersecurity blog"),
-        });
+    let ( is_cat,  card) = check_directory_for_keyword(cybersec_dir, &keyword.value);
+	if is_cat{
+        return Json(card);
     }
 
     // Else Check /var/www/blogs/math if contains Keyword
     let math_dir = "/var/www/blogs/math";
-    if check_directory_for_keyword(math_dir, &keyword_value) {
-        return Json(BlogCard {
-            title: String::from("Math Blog"),
-            desc: String::from("Found in Math blog"),
-        });
+    let ( is_cat,  card) = check_directory_for_keyword(math_dir, &keyword.value);
+	if is_cat{
+        return Json(card);
     }
 
     // If none of the directories contain the Keyword, return this BlogCard
@@ -78,7 +73,7 @@ let keyword_value = keyword.value.clone();
     })	
 }
 
-fn check_directory_for_keyword(directory_path: &str, keyword: &str) -> bool {
+fn check_directory_for_keyword(directory_path: &str, keyword: &str) -> (bool, BlogCard) {
     let keyword_lowercase = keyword.to_lowercase();
     for entry in WalkDir::new(directory_path).into_iter().filter_map(|e| e.ok()) {
         let file_path = entry.path();
@@ -86,11 +81,38 @@ fn check_directory_for_keyword(directory_path: &str, keyword: &str) -> bool {
             if let Some(file_name) = file_path.file_name() {
                 if let Some(file_name_str) = file_name.to_str() {
                     if file_name_str.to_lowercase().contains(&keyword_lowercase) {
-                        return true;
-                    }
+			if let Ok(desc) = get_first_two_lines(file_path.to_str().unwrap()) {
+                            let title = file_name_str.to_string();
+                            let desc = if desc.len() > 150 {
+                                format!("{}...", &desc[..150])
+                            } else {
+                                desc
+                            };
+                            return (true, BlogCard { title, desc });
+                        }                    }
                 }
             }
         }
     }
-    false
+    (false,BlogCard {
+        title: String::from("No Results"),
+        desc: String::from("Please try again"),
+    })	
+}
+
+fn get_first_two_lines(file_path: &str) -> io::Result<String> {
+    let file = File::open(file_path)?;
+    let reader = BufReader::new(file);
+    let mut lines = reader.lines();
+
+    let mut desc = String::new();
+    for _ in 0..2 {
+        if let Some(line) = lines.next() {
+            desc.push_str(&line?);
+            desc.push('\n');
+        } else {
+            break;
+        }
+    }
+    Ok(desc.trim_end().to_string())
 }
