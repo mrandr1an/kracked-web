@@ -10,6 +10,8 @@ RUN apk update && apk upgrade
 
 # Install supervisor
 RUN apk add supervisor
+# Install dependencies for tracing
+RUN apk add libc6-compat
 RUN mkdir -p /var/log/supervisor
 
 WORKDIR /usr/src/kracked-web
@@ -25,6 +27,9 @@ COPY --from=builder /usr/local/cargo/bin/kracked-web /usr/src/kracked-web
 COPY ./frontend /usr/src/kracked-web/frontend
 EXPOSE 443
 EXPOSE 3000
+
+# Set the RUST_LOG environment variable to "trace" to enable all log levels
+ENV RUST_LOG=trace
 
 # Copy the supervisor configuration
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf

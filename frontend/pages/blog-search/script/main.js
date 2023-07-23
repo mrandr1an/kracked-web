@@ -24,7 +24,7 @@
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ keyword }),
+          body: JSON.stringify({"value": "keyword"}),
       })
         .then(response => response.json())
         .then(data => {
