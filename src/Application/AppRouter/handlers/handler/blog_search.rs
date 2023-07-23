@@ -31,8 +31,8 @@ pub async fn get_blog_search() -> Result<Html<String>, AppError>
     retreive_page_untouched("blog-search").await
 }
 
-pub async fn post_blog_search(Json(keyword): Json<Keyword>) -> Json<BlogCard>
+pub async fn post_blog_search(Json(_keyword): Json<Keyword>) -> Json<BlogCard>
 {
-    todo!()
+    Json(BlogCard { title: String::from("else"), desc: String::from("some") })
 }
 
