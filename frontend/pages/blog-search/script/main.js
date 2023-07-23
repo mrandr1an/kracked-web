@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function createComplexElement(title, description) {
-      if(title != "No results"){
+      if(title != "No Results"){
     const outerDiv = document.createElement("div");
     outerDiv.className = "col-md-6 col-lg-4";
     outerDiv.id = "blog-card";
