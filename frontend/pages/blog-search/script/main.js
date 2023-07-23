@@ -29,11 +29,8 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then(response => response.json())
       .then(data => {
-        // Assuming data contains an array of objects with title and description properties
-        data.forEach(item => {
-          const complexElement = createComplexElement(item.title, item.description);
+	  const complexElement = createComplexElement(data.title, data.desc);
           resultsElement.appendChild(complexElement);
-        });
       })
       .catch(error => {
         console.error("Error:", error);
@@ -55,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function createComplexElement(title, description) {
     const outerDiv = document.createElement("div");
     outerDiv.className = "col-md-6 col-lg-4";
-    outerDiv.id = "kracked-web";
+    outerDiv.id = "blog-card";
 
     const innerDiv = document.createElement("div");
     innerDiv.className = "card mb-3 rounded";
