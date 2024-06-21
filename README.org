@@ -1,0 +1,2 @@
+* Kracked-Web
+A simple web server for hosting HTML websites that are meant to be written originally in org.
