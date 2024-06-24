@@ -1,2 +1,4 @@
 * Kracked-Web
 A simple web server for hosting HTML websites that are meant to be written originally in org.
+* Road-map
+To be placed on the master branch these features have to be completed

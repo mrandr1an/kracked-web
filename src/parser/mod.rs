@@ -1,2 +1,2 @@
 pub mod html;
-pub mod org;
+pub mod post;
