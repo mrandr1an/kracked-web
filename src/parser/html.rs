@@ -1,15 +1,12 @@
+use super::theme::Theme;
 use orgize::{
     export::{DefaultHtmlHandler, HtmlHandler},
     Element,
 };
-use slugify::slugify;
 use std::{
-    io::{Error as IOError, Write, WriterPanicked},
+    io::{Error as IOError, Write},
     string::FromUtf8Error,
 };
-
-#[derive(Debug)]
-enum BlogPostType {}
 
 #[derive(Debug)]
 pub enum RenderError {
@@ -37,6 +34,7 @@ pub struct BlogPostHtmlHandler<'a> {
     date: &'a str,
     // categories: &'a str,
     // tags: &'a str,
+    theme: Theme,
 }
 
 impl<'a> BlogPostHtmlHandler<'a> {
@@ -46,6 +44,7 @@ impl<'a> BlogPostHtmlHandler<'a> {
             title,
             author,
             date,
+            theme: Theme::new(),
         }
     }
 }
@@ -53,33 +52,33 @@ impl<'a> BlogPostHtmlHandler<'a> {
 impl<'a> HtmlHandler<RenderError> for BlogPostHtmlHandler<'a> {
     fn start<W: Write>(&mut self, mut w: W, element: &Element) -> Result<(), RenderError> {
         match element {
-            Element::Title(title) => {
-                if title.level == 1 {
-                    Ok(write!(
-                        w,
-                        "<div class=\"section_start\"><div class=\"section_container\"><h2>",
-                    )?)
+            Element::Headline { level } => {
+                if *level == 1 {
+                    Ok(write!(w, "{}", self.theme.title_start())?)
                 } else {
-                    Ok(write!(
-                        w,
-                        "<div class=\"section_start\"><div class=\"section_container\"><h{}>",
-                        title.level + 1,
-                    )?)
+                    Ok(write!(w, "{}", self.theme.heading_start(),)?)
                 }
             }
-            Element::Document { .. } => Ok(write!(
-                w,
-                "<div class=\"post_start\"><div id=\"title_container\">{0}\n{1}\n{2}",
-                self.author, self.date, self.title,
-            )?),
+            Element::Document { .. } => Ok(write!(w, "{}", self.theme.document_start())?),
+            Element::SourceBlock(s) => {
+                let codeblock = self.theme.codeblock_start().replace("#lang#", &s.language);
+                Ok(write!(w, "{}{}", codeblock, s.contents)?)
+            }
             e => Ok(self.handler.start(w, e)?),
         }
     }
 
     fn end<W: Write>(&mut self, mut w: W, element: &Element) -> Result<(), RenderError> {
         match element {
-            Element::Title(title) => Ok(write!(w, "</h{}></div></div>", title.level + 1)?),
-            Element::Document { .. } => Ok(write!(w, "</div></div>")?),
+            Element::Headline { level } => {
+                if *level == 1 {
+                    Ok(write!(w, "{}", self.theme.title_end())?)
+                } else {
+                    Ok(write!(w, "{}", self.theme.heading_end(),)?)
+                }
+            }
+            Element::Document { .. } => Ok(write!(w, "{}", self.theme.document_end())?),
+            Element::SourceBlock(_) => Ok(write!(w, "{}", self.theme.codeblock_end())?),
             e => Ok(self.handler.end(w, e)?),
         }
     }

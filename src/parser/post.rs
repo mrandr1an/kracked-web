@@ -4,11 +4,8 @@ use super::html::*;
 use axum::response::Html;
 use orgize::Org;
 
-pub struct Theme {}
-
 pub struct BlogPost<'a> {
     contents: String,
-    theme: Option<Theme>,
     author: &'a str,
     title: String,
     date: &'a str,
@@ -32,7 +29,6 @@ impl<'a> BlogPost<'a> {
     pub fn new(author: &'a str, date: &'a str, title: String) -> Self {
         Self {
             contents: Self::get_file_contents_from_title(title.clone()),
-            theme: None,
             author,
             title,
             date,
