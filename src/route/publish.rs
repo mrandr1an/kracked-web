@@ -1,6 +1,6 @@
 use std::{
-    fs::{File, OpenOptions},
-    io::{Bytes, Error as IOError, Write},
+    fs::OpenOptions,
+    io::{Error as IOError, Write},
     path::Path,
 };
 
