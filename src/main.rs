@@ -1,33 +1,48 @@
-mod parser;
-mod services;
-use axum::{routing::get, routing::post, Router};
-use services::{blog::blog, home::home, publish::publish};
-use tower_http::services::{ServeDir, ServeFile};
+use axum::{
+    routing::{get, post},
+    Router,
+};
+
+mod route;
 
 #[tokio::main]
 async fn main() {
-    //Routes of website
-    let routes = Router::new()
-        .route("/", get(home))
-        .route("/blog/:blog_title", get(blog))
-        .route("/publish", post(publish))
-        .route_service(
-            "/blog/dependencies/css/styler.css",
-            ServeFile::new("src/theme/dependencies/css/styler.css"),
-        )
-        .route_service(
-            "/blog/dependencies/css/bootstrap.min.css",
-            ServeFile::new("src/theme/dependencies/css/bootstrap.min.css"),
-        )
-        .route_service(
-            "/blog/dependencies/js/bootstrap.min.js",
-            ServeFile::new("src/theme/dependencies/js/bootstrap.min.js"),
-        )
-        .route_service(
-            "/blog/dependencies/js/prism.js",
-            ServeFile::new("src/theme/dependencies/js/prism.js"),
-        );
-
+    let app_router = KrackedRouter::new().routes();
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    axum::serve(listener, routes).await.unwrap();
+    axum::serve(listener, app_router).await.unwrap();
+}
+
+struct KrackedRouter {
+    admin: AdminRouter,
+    // user: Router
+}
+
+struct AdminRouter {
+    blog_router: Router,
+}
+
+impl KrackedRouter {
+    fn new() -> Self {
+        Self {
+            admin: AdminRouter::new(),
+        }
+    }
+
+    fn routes(self) -> Router {
+        self.admin.routes()
+    }
+}
+
+impl AdminRouter {
+    fn new() -> Self {
+        let blog_routes =
+            Router::new().route("/admin/publish", post(route::publish::publish_blog_handler));
+        Self {
+            blog_router: blog_routes,
+        }
+    }
+
+    fn routes(self) -> Router {
+        self.blog_router
+    }
 }
